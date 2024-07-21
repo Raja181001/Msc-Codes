@@ -1,0 +1,65 @@
+from numpy import *
+from matplotlib.pyplot import *
+
+def f(a,t):
+    x = a*(t-sin(t))
+    y = a*(1-cos(t))
+    return x,y
+
+a = 2
+t = linspace(0,pi,10000)
+z = f(a,t)
+m = (z[1][-1]-z[1][0])/(z[0][-1]-z[0][0])
+plot(z[0],-z[1],label='cycloid')
+plot(z[0],-m*z[0],label='Straight Line')
+r = (sqrt((z[0][-1]-z[0][0])**2+(z[1][-1]-z[1][0])**2))/2
+center = (z[0][-1]-z[0][0])/2 , -(z[1][-1]-z[1][0])/2
+x = center[0]+r*cos(t)
+y = center[1]+r*sin(-t)
+angle_degrees = -32.5  
+angle_radians = deg2rad(angle_degrees)
+
+# Apply the rotation transformation to the points of the semicircle
+x_rotated = center[0] + (x - center[0]) * cos(angle_radians) - (y - center[1]) * sin(angle_radians)
+y_rotated = center[1] + (x - center[0]) * sin(angle_radians) + (y - center[1]) * cos(angle_radians)
+
+# Plot the rotated semicircle
+plot(x_rotated, y_rotated,label='Circle')
+
+x1 = z[0][0]
+x2 = z[0][-1]
+y1 = z[1][0]
+y2 = z[1][-1]
+
+a = -(y2 - y1) / (x2 - x1)**2
+b = -2 * a * x1
+
+# Generate x values
+x = linspace(x1, x2, 1000)
+
+# Calculate corresponding y values using the parabolic equation
+y = -(a * x**2 + b * x)
+
+
+fixed_point = array([0, 0])
+
+# Define the angle of rotation in radians
+angle = -(deg2rad(65))  # Rotate by 45 degrees (pi/4 radians)
+
+# Create a 2D rotation matrix
+rotation_matrix = array([[cos(angle), -sin(angle)],
+                            [sin(angle), cos(angle)]])
+
+# Apply the rotation matrix to every point on the parabola
+rotated_points = []
+for point in column_stack((x, y)):
+    translated_point = point - fixed_point
+    rotated_point = dot(rotation_matrix, translated_point) + fixed_point
+    rotated_points.append(rotated_point)
+
+# Convert the list of rotated points back to separate x and y arrays
+rotated_x, rotated_y = zip(*rotated_points)
+plot(rotated_x, rotated_y,label='Parabolla')
+axis('equal')
+legend()
+show()
